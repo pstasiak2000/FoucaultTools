@@ -1,0 +1,39 @@
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.12.6"
+manifest_format = "2.0"
+project_hash = "c49bd8dc32b1ed3770053fa9ba23310dbb4508c6"
+
+[[deps.DelimitedFiles]]
+deps = ["Mmap"]
+git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+version = "1.9.1"
+
+[[deps.FoucaultBase]]
+deps = ["DelimitedFiles"]
+path = "FoucaultBase"
+uuid = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"
+version = "0.1.0"
+
+[[deps.FoucaultTools]]
+deps = ["FoucaultBase", "NSTools", "VFTools"]
+path = "."
+uuid = "7b5131f2-e740-42b3-97e5-0b6bdcc03843"
+version = "0.1.0"
+
+[[deps.Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
+
+[[deps.NSTools]]
+deps = ["FoucaultBase"]
+path = "NSTools"
+uuid = "3c15bdf7-f432-4899-b867-222432cc8a4d"
+version = "0.1.0"
+
+[[deps.VFTools]]
+deps = ["FoucaultBase"]
+path = "VFTools"
+uuid = "4256aab0-9d9b-4a53-98f0-840d100b802e"
+version = "0.1.0"

@@ -1,0 +1,7 @@
+name = "VFTools"
+uuid = "4256aab0-9d9b-4a53-98f0-840d100b802e"
+version = "0.1.0"
+authors = ["Piotr Stasiak <peter.mutd@googlemail.com>"]
+
+[deps]
+FoucaultBase = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"

@@ -1,0 +1,10 @@
+name = "FoucaultBase"
+uuid = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"
+version = "0.1.0"
+authors = ["Piotr Stasiak <peter.mutd@googlemail.com>"]
+
+[deps]
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+
+[compat]
+DelimitedFiles = "1.9.1"

@@ -1,0 +1,15 @@
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.12.6"
+manifest_format = "2.0"
+project_hash = "929c6925c710747b89b1419ef0ae0d6ee986f9d5"
+
+[[deps.FoucaultBase]]
+path = "../FoucaultBase"
+uuid = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"
+version = "0.1.0"
+
+[[deps.VFTools]]
+path = "."
+uuid = "4256aab0-9d9b-4a53-98f0-840d100b802e"
+version = "0.1.0"

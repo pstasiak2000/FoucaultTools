@@ -1,0 +1,9 @@
+name = "FoucaultTools"
+uuid = "7b5131f2-e740-42b3-97e5-0b6bdcc03843"
+version = "0.1.0"
+authors = ["Piotr Stasiak <peter.mutd@googlemail.com>"]
+
+[deps]
+FoucaultBase = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"
+NSTools = "3c15bdf7-f432-4899-b867-222432cc8a4d"
+VFTools = "4256aab0-9d9b-4a53-98f0-840d100b802e"
