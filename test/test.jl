@@ -1,9 +1,6 @@
-using NSTools
+using FoucaultBase
 
 
-path = @__DIR__
+kk = WaveNumbers{ComplexFFT}(128)
 
-x = read_spectrum_time(path)
-
-println(x)
-
+Base.show(kk)
