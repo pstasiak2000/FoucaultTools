@@ -32,6 +32,7 @@ WaveNumbers{F}(N::Int) where {F<:FFTKind} = WaveNumbers{F}((N,))
 WaveNumbers{F}(Nx::Int, Ny::Int) where {F<:FFTKind} = WaveNumbers{F}((Nx,Ny,))
 WaveNumbers{F}(Nx::Int, Ny::Int, Nz::Int) where {F<:FFTKind} = WaveNumbers{F}((Nx,Ny,Nz,))
 
+### By default the WaveNumbers relate to real fields
 WaveNumbers(N::NTuple{D,Int}) where D = WaveNumbers{RealFFT}(N)
 WaveNumbers(N::Int) = WaveNumbers{RealFFT}(N)
 WaveNumbers(Nx::Int, Ny::Int) = WaveNumbers{RealFFT}(Nx,Ny)

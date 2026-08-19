@@ -1,4 +1,3 @@
-
 ### ====================================================== ##
 ### Base I/O operations 
 ### ====================================================== ##
@@ -26,4 +25,19 @@ function read_data(
         end
     end
     return data
+end
+
+
+"""
+    save_data(dir, file, data::AbstractArray)
+
+Writes `data` to a formatted `file` into `dir`.
+"""
+function save_data(
+                   dir::AbstractString,
+                   file::AbstractString,
+                   data::AbstractArray
+    )
+    
+    writedlm(joinpath(dir,file),data)
 end
