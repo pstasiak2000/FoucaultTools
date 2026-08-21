@@ -2,33 +2,43 @@
 ### Field routines
 ### ====================================================== ##
 #
-#   This file consists of the definitions of fields and the routines involved in various computations directly from the 1D-3D velocity and other fields derived from foucault.
+#   This file consists of the definitions of fields and the routines involved in various computations directly from the 1D-3D.
 # 
 #
 
 export Field
 
-abstract type FieldType end
+abstract type FieldType{T} end
 
-struct RealField <: FieldType end
-struct ComplexField <: FieldType end
+struct RealField{T<:Real} <: FieldType{T} end
+struct ComplexField{T<:Complex} <: FieldType{T} end
 
 
 """
-    Field{T,N,A<:AbstractArray{T,N}} <: AbstractArray{T,N}
+    Field{D,A<:AbstractArray{T,D}} <: AbstractArray{T,D}
 
 Main semantic wrapper used for fields.
 """
-struct Field{F<:FieldType,T,N,A<:AbstractArray{T,N}} <: AbstractArray{T,N}
+struct Field{F<:FieldType,D,T,A<:AbstractArray{T,D}} <: AbstractArray{T,D}
     data::A
 end
 
-Field(data::A) where {T<:Real,N,A<:AbstractArray{T,N}} = Field{RealField, T, N, A}(data)
-Field(data::A) where {T<:Complex,N,A<:AbstractArray{T,N}} = Field{ComplexField, T, N, A}(data)
+Field(data::A) where {D,T<:Real,A<:AbstractArray{T,D}} = Field{RealField{T}, D, T, A}(data)
+Field(data::A) where {D,T<:Complex,A<:AbstractArray{T,D}} = Field{ComplexField{T}, D, T, A}(data)
 
 Base.size(f::Field) = size(f.data)
 Base.getindex(f::Field, I...) = getindex(f.data, I...)
 Base.setindex!(f::Field, x, I...) = setindex!(f.data, x, I...)
-Base.IndexStyle(::Type{<:Field{F,T,N,A}}) where {F,T,N,A} = IndexStyle(A)
+Base.IndexStyle(::Type{<:Field{F, D, T, A}}) where {F,D, T, A} = IndexStyle(A)
 
-fieldtype(f::Field{F,T,N,A}) where {F,T,N,A} = F
+Base.zeros(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(zeros(T,N...))
+Base.rand(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(rand(T,N...))
+
+
+fieldtype(f::Field{F}) where {F} = F
+
+component(f::Field{F,D}, i::Int) where {F,D} = selectdim(f, D, i) 
+
+
+
+
