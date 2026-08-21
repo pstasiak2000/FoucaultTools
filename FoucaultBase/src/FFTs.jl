@@ -28,15 +28,12 @@ function WaveNumbers{RealFFT}(N::NTuple{D,Int}, L::NTuple{D,T}) where {D,T}
 end
 
 WaveNumbers{F}(N::NTuple{D,Int}) where {D,F<:FFTKind} = WaveNumbers{F}(N, ntuple(_ -> 2π, Val(D)))
-WaveNumbers{F}(N::Int) where {F<:FFTKind} = WaveNumbers{F}((N,))
-WaveNumbers{F}(Nx::Int, Ny::Int) where {F<:FFTKind} = WaveNumbers{F}((Nx,Ny,))
-WaveNumbers{F}(Nx::Int, Ny::Int, Nz::Int) where {F<:FFTKind} = WaveNumbers{F}((Nx,Ny,Nz,))
+WaveNumbers(N::NTuple{D,Int}) where D = WaveNumbers{RealFFT}(N)
+
+WaveNumbers{F}(N::Vararg{Int}) where {F<:FFTKind} = WaveNumbers{F}(N)
+WaveNumbers(N::Vararg{Int}) = WaveNumbers{RealFFT}(N)
 
 ### By default the WaveNumbers relate to real fields
-WaveNumbers(N::NTuple{D,Int}) where D = WaveNumbers{RealFFT}(N)
-WaveNumbers(N::Int) = WaveNumbers{RealFFT}(N)
-WaveNumbers(Nx::Int, Ny::Int) = WaveNumbers{RealFFT}(Nx,Ny)
-WaveNumbers(Nx::Int, Ny::Int, Nz::Int) = WaveNumbers{RealFFT}(Nx,Ny,Nz)
 
 Base.size(kk::WaveNumbers) = kk.N
 dims(kk::WaveNumbers{D}) where D = D

@@ -14,8 +14,6 @@ module NSTools
 using FoucaultBase
 
 export SpectrumData
-export Field
-
 
 export read_spectrum
 export read_spectrum_time
@@ -66,7 +64,6 @@ const HydroNS = Dict(
 
 include("io.jl")
 include("hydroNS.jl")
-include("fields.jl")
 
 
 

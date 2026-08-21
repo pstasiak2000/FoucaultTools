@@ -6,6 +6,8 @@
 # 
 #
 
+export Field
+
 abstract type FieldType end
 
 struct RealField <: FieldType end
