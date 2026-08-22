@@ -100,6 +100,9 @@ fieldtype(v::VectorField{F}) where {F} = F
 
 check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSizeMismatch(size(x),size(y)))
 
+
+
+
 function dot!(z::Field{F,D}, x::VectorField{F,D}, y::VectorField{F,D}) where {F,D}
     for i=1:D
         @. z += x[i] * conj(y[i])
