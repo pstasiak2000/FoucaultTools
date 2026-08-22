@@ -9,7 +9,11 @@
 export Field
 export VectorField
 
+export RealField, ComplexField
 export RealField64, ComplexField64
+
+export RealVectorField, ComplexVectorField 
+export RealVectorField64, ComplexVectorField64
 
 abstract type FieldType{T} end
 
@@ -18,6 +22,24 @@ struct ComplexField{T<:Complex} <: FieldType{T} end
 
 const RealField64 = RealField{Float64}
 const ComplexField64 = ComplexField{ComplexF64}
+
+struct FieldSizeMismatch <: Exception
+    xsize
+    ysize
+end
+
+function Base.showerror(io::IO, e::FieldSizeMismatch) 
+    println("Field size mismatch between vector field components: Both fields must have the same size")
+    println("Field 1: $(e.xsize)")
+    println("Field 2: $(e.ysize)")
+end
+
+
+####################################################################
+#
+#       (Scalar) Field definitions
+#
+####################################################################
 
 """
     Field{D,A<:AbstractArray{T,D}} <: AbstractArray{T,D}
@@ -42,43 +64,56 @@ Base.rand(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(rand(T,N
 
 fieldtype(f::Field{F}) where {F} = F
 
+####################################################################
+#
+#       Vector Field definitions
+#
+####################################################################
 """
     VectorField{F<:FieldType, D, T}
 
 Wrapper used for vector fields.
 """
-struct VectorField{F,D,T}
-    components::NTuple{D,Field{F,D,T}} 
+struct VectorField{F,D,T,A<:AbstractArray{T,D}}
+    components::NTuple{D,Field{F,D,T,A}} 
 end
 
-VectorField(components::NTuple{D,Field{F,D,T}}) where {D,F,T} = VectorField{F,D,T}(components)
+const RealVectorField{T<:Real} = VectorField{RealField{T}}
+const ComplexVectorField{T<:Complex} = VectorField{ComplexField{T}} 
+
+const RealVectorField64 = VectorField{RealField64}
+const ComplexVectorField64 = VectorField{ComplexField64}
+
+VectorField(components::NTuple{D,Field{F,D,T,A}}) where {D,F,T,A} = VectorField{F,D,T,A}(components)
 VectorField(components::NTuple{D,AbstractArray{T,D}}) where {D,T} = VectorField(Field.(components))
 
 VectorField(components::Vararg{Field}) = VectorField(components)
 
+Base.size(v::VectorField) = size(first(v.components))
+Base.getindex(v::VectorField, i::Int) = v.components[i]
+Base.setindex!(v::VectorField, x, I...) = setindex!(v.components, x, I...)
+
 Base.zeros(::Type{<:VectorField{F}},M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> zeros(F,M...),Val(D)))
 Base.rand(::Type{<:VectorField{F}},M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> rand(F,M...),Val(D)))
 
+fieldtype(v::VectorField{F}) where {F} = F
 
-#function dot!(z::Field{F,Dz}, x::Field{F,D}, y::Field{F,D}) where {F,D,Dz}
-#    @assert Dz == D - 1 "Dimension mismatch between output and input arrays"
-#    @assert size(x) == size(y) "Size mismatch between input arrays"
-#    @assert size(z) == size(x)[1:(D-1)] "Size mismatch beween input and output arrays"
-#
-#    for i = 1:D-1
-#        z .+= component(x,i) .* conj.(component(y,i)) 
-#    end
-#end
-#
-#function LinearAlgebra.dot(x::Field{F,D},y::Field{F,D}) where {F,D}
-#    @assert size(x) == size(y) "Input vectors need to be the same size!"
-#    red_dims = size(x)[1:(D-1)]
-#    z = zeros(F,red_dims...)
-#    
-#    dot!(z, x, y)
-#
-#    return z
-#end
+check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSizeMismatch(size(x),size(y)))
+
+function dot!(z::Field{F,D}, x::VectorField{F,D}, y::VectorField{F,D}) where {F,D}
+    for i=1:D
+        @. z += x[i] * conj(y[i])
+    end
+end
+
+function LinearAlgebra.dot(x::VectorField{F,D},y::VectorField{F,D}) where {F,D}
+    check_size(x,y)
+    z = zeros(F,size(x)...)
+    
+    dot!(z,x,y)
+
+    return z
+end
 
 
 
