@@ -1,14 +1,16 @@
 name = "FoucaultBase"
 uuid = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"
-version = "0.1.0"
 authors = ["Piotr Stasiak <peter.mutd@googlemail.com>"]
+version = "0.1.0"
 
 [deps]
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [compat]
 DelimitedFiles = "1.9.1"
 FFTW = "1.10.0"
+LinearAlgebra = "1.11.0"
 Printf = "1.11.0"

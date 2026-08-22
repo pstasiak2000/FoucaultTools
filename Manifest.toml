@@ -68,7 +68,7 @@ uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 version = "1.11.0"
 
 [[deps.FoucaultBase]]
-deps = ["DelimitedFiles", "FFTW", "Printf"]
+deps = ["DelimitedFiles", "FFTW", "LinearAlgebra", "Printf"]
 path = "FoucaultBase"
 uuid = "aaf8cd2f-76e1-45d4-97a8-038d3664b746"
 version = "0.1.0"

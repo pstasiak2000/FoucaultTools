@@ -3,7 +3,7 @@ module FoucaultBase
 using Printf
 using DelimitedFiles
 using FFTW
-
+using LinearAlgebra
 
 export RealFFT
 export ComplexFFT

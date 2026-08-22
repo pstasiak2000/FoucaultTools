@@ -60,6 +60,12 @@ Base.zeros(::Type{<:VectorField{F}},M::Vararg{Int,D}) where {F,D} = VectorField(
 Base.rand(::Type{<:VectorField{F}},M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> rand(F,M...),Val(D)))
 
 
+
+
+Base.view(v::VectorField, I...) =
+    VectorFieldView(ntuple(i -> view(v.components[i], I...), Val(length(v.components)))
+
+
 #function dot!(z::Field{F,Dz}, x::Field{F,D}, y::Field{F,D}) where {F,D,Dz}
 #    @assert Dz == D - 1 "Dimension mismatch between output and input arrays"
 #    @assert size(x) == size(y) "Size mismatch between input arrays"
