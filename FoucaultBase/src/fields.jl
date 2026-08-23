@@ -15,6 +15,8 @@ export RealField64, ComplexField64
 export RealVectorField, ComplexVectorField 
 export RealVectorField64, ComplexVectorField64
 
+export dot!
+
 abstract type FieldType{T} end
 
 struct RealField{T<:Real} <: FieldType{T} end
@@ -101,14 +103,28 @@ fieldtype(v::VectorField{F}) where {F} = F
 check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSizeMismatch(size(x),size(y)))
 
 
+####################################################################
+#
+#      Operations 
+#
+####################################################################
 
+"""
+    dot!(z::Field, x::VectorField, y::VectorField)
 
+In-place variant of [`dot`](@ref) for vector fields.
+"""
 function dot!(z::Field{F,D}, x::VectorField{F,D}, y::VectorField{F,D}) where {F,D}
-    for i=1:D
-        @. z += x[i] * conj(y[i])
+    @inbounds for i=1:D
+        @. z += conj.(x[i]) * y[i]
     end
 end
 
+"""
+    LinearAlgebra.dot(x::VectorField,y::VectorField})
+
+Performs a piecewice dot product on two vector fields, and outputs a `Field` structure with the same spatial structure. 
+"""
 function LinearAlgebra.dot(x::VectorField{F,D},y::VectorField{F,D}) where {F,D}
     check_size(x,y)
     z = zeros(F,size(x)...)
@@ -117,8 +133,6 @@ function LinearAlgebra.dot(x::VectorField{F,D},y::VectorField{F,D}) where {F,D}
 
     return z
 end
-
-
 
 
 
