@@ -15,7 +15,7 @@ export RealField64, ComplexField64
 export RealVectorField, ComplexVectorField 
 export RealVectorField64, ComplexVectorField64
 
-export dot!
+export dot!, cross!
 
 abstract type FieldType{T} end
 
@@ -63,6 +63,8 @@ Base.IndexStyle(::Type{<:Field{F, D, T, A}}) where {F,D, T, A} = IndexStyle(A)
 
 Base.zeros(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(zeros(T,N...))
 Base.rand(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(rand(T,N...))
+Base.similar(f::Field{F,D}) where {F,D} = Base.zeros(F,size(f)...)
+
 
 fieldtype(f::Field{F}) where {F} = F
 
@@ -90,10 +92,6 @@ VectorField(components::NTuple{C,Field{F,D,T,A}}) where {C,D,F,T,A} = VectorFiel
 VectorField(components::NTuple{C,AbstractArray{T,D}}) where {C,D,T} = VectorField(Field.(components))
 
 VectorField(components::Vararg{Field}) = VectorField(components)
-
-
-
-
 
 
 struct VectorFieldStyle <: Base.Broadcast.BroadcastStyle end
@@ -152,41 +150,17 @@ end
 
 _find_vectorfield(x::VectorField) = x
 
-
-
-
-
 Base.size(v::VectorField) = size(first(v.components))
 Base.getindex(v::VectorField, i::Int) = v.components[i]
 Base.setindex!(v::VectorField, x, I...) = setindex!(v.components, x, I...)
 Base.length(v::VectorField{F,C}) where {F,C} = C
-
-#
-#function Base.:+(x::VectorField{F,C,D},
-#        y::VectorField{F,C,D}
-#       ) where {F,C,D}
-#    VectorField(ntuple(i -> x[i] + y[i],Val(C)))  
-#end
-#
-#function Base.:*(c::Number, x::VectorField{F,C,D}) where {F,C,D}
-#    VectorField(
-#        ntuple(i -> c .* x.components[i], Val(C))
-#    )
-#end
-#
-#Base.:*(x::VectorField, c::Number) = c * x
-#
-#function Base.broadcast(
-#        ::typeof(*),
-#        x::VectorField{F,C,D},
-#        y::VectorField{F,C,D}
-#    ) where {F,C,D}
-#    
-#    VectorField(ntuple(i -> x[i] .* y[i],Val(C)))
-#end
+dims(v::VectorField) = length(v)
 
 Base.zeros(::Type{<:VectorField{F}},C::Int,M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> zeros(F,M...), C))
+
 Base.rand(::Type{<:VectorField{F}},C::Int,M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> rand(F,M...), C))
+
+Base.similar(v::VectorField{F,C}) where {F,C} = zeros(typeof(v),C,size(v)...)
 
 fieldtype(v::VectorField{F}) where {F} = F
 
@@ -204,18 +178,18 @@ check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSiz
 
 In-place variant of [`dot`](@ref) for vector fields.
 """
-function dot!(z::Field{F,D}, x::VectorField{F,D}, y::VectorField{F,D}) where {F,D}
-    @inbounds for i=1:D
+function dot!(z::Field{F,D}, x::VectorField{F,C,D}, y::VectorField{F,C,D}) where {F,C,D}
+    @inbounds for i=1:C
         @. z += conj.(x[i]) * y[i]
     end
 end
 
 """
-    LinearAlgebra.dot(x::VectorField,y::VectorField})
+    LinearAlgebra.dot(x::VectorField,y::VectorField)
 
 Performs a piecewice dot product on two vector fields, and outputs a `Field` structure with the same spatial structure. 
 """
-function LinearAlgebra.dot(x::VectorField{F,D},y::VectorField{F,D}) where {F,D}
+function LinearAlgebra.dot(x::VectorField{F,C,D},y::VectorField{F,C,D}) where {F,C,D}
     check_size(x,y)
     z = zeros(F,size(x)...)
     
@@ -224,5 +198,29 @@ function LinearAlgebra.dot(x::VectorField{F,D},y::VectorField{F,D}) where {F,D}
     return z
 end
 
+"""
+    FoucaultBase.cross!(z,x,y)
+
+In-place variant of [`cross`](@ref) for vector fields.
+"""
+function cross!(z::VectorField{F,3,D},
+                              x::VectorField{F,3,D}, 
+                              y::VectorField{F,3,D}) where {F,D}
+    @. z[1] = (x[2] * y[3]) - (x[3] * y[2])
+    @. z[2] = (x[3] * y[1]) - (x[1] * y[3])
+    @. z[3] = (x[1] * y[2]) - (x[2] * y[1])
+    return nothing
+end
 
 
+"""
+    LinearAlgebra.cross(x::VectorField, y::VectorField)
+
+Performs a vector cross product on two vector fields, and outputs a `VectorField` structure type.
+"""
+function LinearAlgebra.cross(x::VectorField{F,3,D},y::VectorField{F,3,D}) where {F,D}
+    check_size(x,y)
+    z = zeros(typeof(x),3,size(x)...)
+    cross!(z,x,y)
+    return z
+end
