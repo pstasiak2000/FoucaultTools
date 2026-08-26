@@ -5,7 +5,8 @@ using NSTools
 
 using Test
 
-path = "/home/piotr-stasiak/Codes/FoucaultTools/test/data"
+#path = "/home/piotr-stasiak/Codes/FoucaultTools/test/data"
+path = joinpath(@__DIR__,"data")
 
 tt = read_spectrum_time(path)
 

@@ -12,18 +12,18 @@ packages.
 
 ## Fields
 
-- [ ] Implement basic `Field` operations
-  - [ ] Addition
-  - [ ] Subtraction
-  - [ ] Scalar multiplication
-  - [ ] Element-wise operations
-  - [ ] Other basic arithmetic operations
+- [x] Implement basic `Field` operations
+  - [x] Addition
+  - [x] Subtraction
+  - [x] Scalar multiplication
+  - [x] Element-wise operations
+  - [x] Other basic arithmetic operations
 
-- [ ] Implement basic vector-field operations
-  - [ ] Vector-field addition
-  - [ ] Vector-field subtraction
-  - [ ] Scalar multiplication
-  - [ ] Dot product
+- [x] Implement basic vector-field operations
+  - [x] Vector-field addition
+  - [x] Vector-field subtraction
+  - [x] Scalar multiplication
+  - [x] Dot product
   - [ ] Cross product
   - [ ] Norm / magnitude
 

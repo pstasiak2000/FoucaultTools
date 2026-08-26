@@ -72,12 +72,12 @@ fieldtype(f::Field{F}) where {F} = F
 #
 ####################################################################
 """
-    VectorField{F<:FieldType, D, T}
+    VectorField{F<:FieldType, C, D, T, A}
 
 Wrapper used for vector fields.
 """
-struct VectorField{F,D,T,A<:AbstractArray{T,D}}
-    components::NTuple{D,Field{F,D,T,A}} 
+struct VectorField{F,C,D,T,A<:AbstractArray{T,D}}
+    components::NTuple{C,Field{F,D,T,A}} 
 end
 
 const RealVectorField{T<:Real} = VectorField{RealField{T}}
@@ -86,17 +86,107 @@ const ComplexVectorField{T<:Complex} = VectorField{ComplexField{T}}
 const RealVectorField64 = VectorField{RealField64}
 const ComplexVectorField64 = VectorField{ComplexField64}
 
-VectorField(components::NTuple{D,Field{F,D,T,A}}) where {D,F,T,A} = VectorField{F,D,T,A}(components)
-VectorField(components::NTuple{D,AbstractArray{T,D}}) where {D,T} = VectorField(Field.(components))
+VectorField(components::NTuple{C,Field{F,D,T,A}}) where {C,D,F,T,A} = VectorField{F,C,D,T,A}(components)
+VectorField(components::NTuple{C,AbstractArray{T,D}}) where {C,D,T} = VectorField(Field.(components))
 
 VectorField(components::Vararg{Field}) = VectorField(components)
+
+
+
+
+
+
+struct VectorFieldStyle <: Base.Broadcast.BroadcastStyle end
+
+Base.BroadcastStyle(::Type{<:VectorField}) = VectorFieldStyle()
+Base.broadcastable(x::VectorField) = x
+
+Base.BroadcastStyle(
+    ::VectorFieldStyle,
+    ::Base.Broadcast.DefaultArrayStyle
+) = VectorFieldStyle()
+
+Base.BroadcastStyle(
+    ::Base.Broadcast.DefaultArrayStyle,
+    ::VectorFieldStyle
+) = VectorFieldStyle()
+
+_broadcast_component(x::VectorField, i) = x[i]
+_broadcast_component(x, i) = x
+
+function _broadcast_component(
+    bc::Base.Broadcast.Broadcasted,
+    i
+)
+    Base.Broadcast.broadcasted(
+        bc.f,
+        (_broadcast_component(arg, i) for arg in bc.args)...
+    )
+end
+
+function Base.copy(
+    bc::Base.Broadcast.Broadcasted{VectorFieldStyle}
+)
+    vf = _find_vectorfield(bc)
+
+    C = length(vf.components)
+
+    components = ntuple(Val(C)) do i
+        Base.materialize(_broadcast_component(bc, i))
+    end
+
+    VectorField(components)
+end
+
+function _find_vectorfield(bc::Base.Broadcast.Broadcasted)
+    for arg in bc.args
+        if arg isa VectorField
+            return arg
+        elseif arg isa Base.Broadcast.Broadcasted
+            return _find_vectorfield(arg)
+        end
+    end
+
+    error("No VectorField found in broadcast expression")
+end
+
+_find_vectorfield(x::VectorField) = x
+
+
+
+
 
 Base.size(v::VectorField) = size(first(v.components))
 Base.getindex(v::VectorField, i::Int) = v.components[i]
 Base.setindex!(v::VectorField, x, I...) = setindex!(v.components, x, I...)
+Base.length(v::VectorField{F,C}) where {F,C} = C
 
-Base.zeros(::Type{<:VectorField{F}},M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> zeros(F,M...),Val(D)))
-Base.rand(::Type{<:VectorField{F}},M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> rand(F,M...),Val(D)))
+#
+#function Base.:+(x::VectorField{F,C,D},
+#        y::VectorField{F,C,D}
+#       ) where {F,C,D}
+#    VectorField(ntuple(i -> x[i] + y[i],Val(C)))  
+#end
+#
+#function Base.:*(c::Number, x::VectorField{F,C,D}) where {F,C,D}
+#    VectorField(
+#        ntuple(i -> c .* x.components[i], Val(C))
+#    )
+#end
+#
+#Base.:*(x::VectorField, c::Number) = c * x
+#
+#function Base.broadcast(
+#        ::typeof(*),
+#        x::VectorField{F,C,D},
+#        y::VectorField{F,C,D}
+#    ) where {F,C,D}
+#    
+#    VectorField(ntuple(i -> x[i] .* y[i],Val(C)))
+#end
+
+Base.zeros(::Type{<:VectorField{F}},C::Int,M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> zeros(F,M...), C))
+Base.rand(::Type{<:VectorField{F}},C::Int,M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> rand(F,M...), C))
 
 fieldtype(v::VectorField{F}) where {F} = F
 
