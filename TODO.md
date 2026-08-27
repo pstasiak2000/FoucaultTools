@@ -24,7 +24,7 @@ packages.
   - [x] Vector-field subtraction
   - [x] Scalar multiplication
   - [x] Dot product
-  - [ ] Cross product
+  - [x] Cross product
   - [ ] Norm / magnitude
 
 - [ ] Implement differential field operations
@@ -101,6 +101,7 @@ Tools for working with vortex-filament data.
 - [ ] Implement vortex data writing
   - [ ] Write individual configurations
   - [ ] Write vortex tangles
+  - [ ] Add support for writing VTK vortex files
 
 ## Basic vortex operations
 
