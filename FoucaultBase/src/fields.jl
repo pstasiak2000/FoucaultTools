@@ -15,7 +15,12 @@ export RealField64, ComplexField64
 export RealVectorField, ComplexVectorField 
 export RealVectorField64, ComplexVectorField64
 
+export fieldkind
 export dot!, cross!
+
+
+
+
 
 abstract type FieldType{T} end
 
@@ -55,6 +60,34 @@ end
 Field(data::A) where {D,T<:Real,A<:AbstractArray{T,D}} = Field{RealField{T}, D, T, A}(data)
 Field(data::A) where {D,T<:Complex,A<:AbstractArray{T,D}} = Field{ComplexField{T}, D, T, A}(data)
 
+struct FieldStyle <: Base.Broadcast.BroadcastStyle end
+
+Base.BroadcastStyle(::Type{<:Field}) = FieldStyle()
+
+Base.BroadcastStyle(
+    ::FieldStyle,
+    ::Base.Broadcast.DefaultArrayStyle
+) = FieldStyle()
+    
+Base.BroadcastStyle(
+    ::Base.Broadcast.DefaultArrayStyle,
+    ::FieldStyle
+) = FieldStyle()
+    
+Base.broadcastable(f::Field) = f
+
+function Base.copy(bc::Base.Broadcast.Broadcasted{FieldStyle})
+    data = Base.materialize(
+        Base.Broadcast.Broadcasted(
+            Base.Broadcast.DefaultArrayStyle{ndims(bc)}(),
+            bc.f,
+            bc.args
+        )
+    )
+
+    Field(data)
+end
+
 Base.size(f::Field) = size(f.data)
 Base.axes(f::Field) = axes(f.data)
 Base.getindex(f::Field, I...) = getindex(f.data, I...)
@@ -66,7 +99,7 @@ Base.rand(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(rand(T,N
 Base.similar(f::Field{F,D}) where {F,D} = Base.zeros(F,size(f)...)
 
 
-fieldtype(f::Field{F}) where {F} = F
+fieldkind(::Field{F}) where {F} = F
 
 ####################################################################
 #
@@ -162,7 +195,7 @@ Base.rand(::Type{<:VectorField{F}},C::Int,M::Vararg{Int,D}) where {F,D} = Vector
 
 Base.similar(v::VectorField{F,C}) where {F,C} = zeros(typeof(v),C,size(v)...)
 
-fieldtype(v::VectorField{F}) where {F} = F
+fieldkind(::VectorField{F}) where {F} = F
 
 check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSizeMismatch(size(x),size(y)))
 
