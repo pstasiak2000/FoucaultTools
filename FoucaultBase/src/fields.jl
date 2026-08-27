@@ -1,6 +1,7 @@
-### ====================================================== ##
-### Field routines
-### ====================================================== ##
+# ====================================================== ##
+# Field routines
+# ====================================================== ##
+
 #
 #   This file consists of the definitions of fields and the routines involved in various computations directly from the 1D-3D.
 # 
@@ -18,6 +19,10 @@ export RealVectorField64, ComplexVectorField64
 export fieldkind
 export dot!, cross!
 
+
+# -----------------------------------------
+# Abstract Types 
+# -----------------------------------------
 
 abstract type FieldType{T} end
 
@@ -38,12 +43,10 @@ function Base.showerror(io::IO, e::FieldSizeMismatch)
     println("Field 2: $(e.ysize)")
 end
 
-
-####################################################################
+# -----------------------------------------
+# (Scalar) Field definitions
+# -----------------------------------------
 #
-#       (Scalar) Field definitions
-#
-####################################################################
 
 """
     Field{D,A<:AbstractArray{T,D}} <: AbstractArray{T,D}
@@ -100,11 +103,10 @@ Base.similar(f::Field{F,D}) where {F,D} = Base.zeros(F,size(f)...)
 
 fieldkind(::Field{F}) where {F} = F
 
-####################################################################
+# -----------------------------------------
+# Vector Field definitions
+# -----------------------------------------
 #
-#       Vector Field definitions
-#
-####################################################################
 """
     VectorField{F<:FieldType, C, D, T, A}
 
@@ -211,12 +213,9 @@ Sum the components of the vector field piece-wise.
 Base.sum(v::VectorField) = sum(v.components)
 
 
-####################################################################
-#
-#      Operations 
-#
-####################################################################
-
+# -----------------------------------------
+# Vector Field Operations 
+# -----------------------------------------
 """
     dot!(z::Field, x::VectorField, y::VectorField)
 

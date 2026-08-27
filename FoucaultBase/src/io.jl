@@ -1,6 +1,10 @@
-### ====================================================== ##
-### Base I/O operations 
-### ====================================================== ##
+# ======================================================
+# Base I/O operations 
+# ======================================================
+
+# ------------------------------------------------------
+# Formatted data
+# ------------------------------------------------------
 
 """
     read_data(dir, file, ::Type{T})
@@ -15,7 +19,7 @@ function read_data(
     
     raw = readdlm(joinpath(dir,file))
     
-    ### Handles reading of Fortran exponent notation and converts
+    ### Handles reading of Fortran exponent notation and converts{{{
     ### all string data into numeric type T (by default Float64)
     data = map(raw) do x
         if x isa AbstractString
@@ -26,7 +30,6 @@ function read_data(
     end
     return data
 end
-
 
 """
     save_data(dir, file, data::AbstractArray)
@@ -41,3 +44,10 @@ function save_data(
     
     writedlm(joinpath(dir,file),data)
 end
+
+
+# ------------------------------------------------------
+# Binary data
+# ------------------------------------------------------
+
+
