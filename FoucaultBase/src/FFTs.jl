@@ -111,6 +111,6 @@ size(w)
 # (65, 128, 128)
 """
 Base.size(w::WaveNumbers) = kk.N
-dims(w::WaveNumbers{D}) where D = D
+Base.ndims(w::WaveNumbers{D}) where D = D
 fft_kind(w::WaveNumbers{D,T,F}) where {D,T,F<:FFTKind} = F()
 

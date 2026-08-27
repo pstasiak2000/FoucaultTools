@@ -10,8 +10,6 @@ export ComplexFFT
 
 export read_data
 export WaveNumbers
-export dims
-
 
 
 

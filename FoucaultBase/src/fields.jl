@@ -19,9 +19,6 @@ export fieldkind
 export dot!, cross!
 
 
-
-
-
 abstract type FieldType{T} end
 
 struct RealField{T<:Real} <: FieldType{T} end
@@ -93,6 +90,8 @@ Base.axes(f::Field) = axes(f.data)
 Base.getindex(f::Field, I...) = getindex(f.data, I...)
 Base.setindex!(f::Field, x, I...) = setindex!(f.data, x, I...)
 Base.IndexStyle(::Type{<:Field{F, D, T, A}}) where {F,D, T, A} = IndexStyle(A)
+Base.copy(f::Field) = Field(copy(f.data))
+
 
 Base.zeros(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(zeros(T,N...))
 Base.rand(::Type{<:FieldType{T}}, N::Vararg{Int,D}) where {T,D} = Field(rand(T,N...))
@@ -183,11 +182,13 @@ end
 
 _find_vectorfield(x::VectorField) = x
 
+Base.eltype(v::VectorField{F,C,D,T}) where {F,C,D,T} = T
 Base.size(v::VectorField) = size(first(v.components))
 Base.getindex(v::VectorField, i::Int) = v.components[i]
 Base.setindex!(v::VectorField, x, I...) = setindex!(v.components, x, I...)
 Base.length(v::VectorField{F,C}) where {F,C} = C
-dims(v::VectorField) = length(v)
+Base.ndims(v::VectorField) = length(v)
+Base.copy(x::VectorField) = VectorField(map(copy, x.components))
 
 Base.zeros(::Type{<:VectorField{F}},C::Int,M::Vararg{Int,D}) where {F,D} = VectorField(ntuple(_ -> zeros(F,M...), C))
 
@@ -198,6 +199,9 @@ Base.similar(v::VectorField{F,C}) where {F,C} = zeros(typeof(v),C,size(v)...)
 fieldkind(::VectorField{F}) where {F} = F
 
 check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSizeMismatch(size(x),size(y)))
+
+#Base.show(io::IO, ::MIME"text/plain", f::Field{F,D}) where {F,D} =
+#    print(io, "Field{$F,$D} with size ", size(f))
 
 """
     Base.sum(v::VectorField)
