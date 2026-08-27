@@ -199,6 +199,13 @@ fieldkind(::VectorField{F}) where {F} = F
 
 check_size(x::VectorField,y::VectorField) = size(x) == size(y) || throw(FieldSizeMismatch(size(x),size(y)))
 
+"""
+    Base.sum(v::VectorField)
+
+Sum the components of the vector field piece-wise.
+"""
+Base.sum(v::VectorField) = sum(v.components)
+
 
 ####################################################################
 #
@@ -257,3 +264,14 @@ function LinearAlgebra.cross(x::VectorField{F,3,D},y::VectorField{F,3,D}) where 
     cross!(z,x,y)
     return z
 end
+
+"""
+    LinearAlgebra.norm(v::VectorField; p::Real=2)
+
+Computes a p-norm of the vector field on the components.
+
+The function defaults to the 2-norm.
+"""
+LinearAlgebra.norm(v::VectorField; p::Real=2) = sum(v .^ p)
+
+
